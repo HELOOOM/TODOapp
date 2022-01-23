@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>icone2/delete.jpeg</file>
+        <file>icone2/add.jpeg</file>
+        <file>icone2/finished.jpeg</file>
+        <file>icone2/pending.jpeg</file>
+        <file>icone2/exit.jpeg</file>
+        <file>icone2/today.png</file>
+    </qresource>
+</RCC>
