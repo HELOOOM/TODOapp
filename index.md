@@ -79,381 +79,270 @@
 
  - ## First we create two **UI** **( task.ui , taskmanager.ui )**
 
-![Screenshot-2022-01-23-095808](https://user-images.githubusercontent.com/53974876/150671610-901ec496-e154-4ab5-a7e8-788c793304d7.png)
+![image](https://user-images.githubusercontent.com/53974876/150687835-a702cb91-9e0a-4133-9b49-fd67cad8a409.png)![image](https://user-images.githubusercontent.com/53974876/150687806-1f1919bd-369a-45a6-9e2b-71b96911f54e.png)
 
-- ## Now let's see the (Header) task
+- ## Now let's see the (Header) TaskDescription
 
-## Task.h
+## TaskDescription.h
 - ### our class task will inherit from QDialog
 
 ```c++
-#ifndef TASK_H
-#define TASK_H
+#ifndef TASKDESCRIPTION_H
+#define TASKDESCRIPTION_H
 #include <QDialog>
-#include <QStringListModel>
-#include "taskmanager.h"
-#include<QtDebug>
-
+#include "task.h"
+#include <QListWidgetItem>
 namespace Ui {
-class task;
+class TaskDescription;
 }
-
-class task : public QDialog
+class TaskDescription : public QDialog
 {
     Q_OBJECT
 
 public:
- explicit task(QWidget *parent = nullptr);
-  ~task();
-```
-- ### Now we will add boolean named ` logic ` we will see in the next steps why
- ```c++
- bool logic=false;
-
-Ui::task *ui;
-```
-- ### Two private slot
-```c++
+    TaskDescription(QWidget *parent = nullptr);
+    ~TaskDescription();
+    Ui::TaskDescription *ui;
+    bool logic=false;
 private slots:
-void on_OK_clicked();
-void on_Cancel_clicked();
-private:
-};
- ```
- ## Task.cpp
+    void on_buttonBox_accepted();
 
-- ### First we setup our UI
+private:
+
+   // Ui::TaskDescription *ui;
+};
+```
+
+ ## TaskDescription.cpp
+
+- ### First we setup our UI then the implementation for the slots already declared in [TaskDescription.h](#taskdescriptionh)
 ```c++
-#include "task.h"
-#include "ui_task.h"
-#include "taskmanager.h"
-#include "ui_taskmanager.h"
-#include <QDate>
-task::task(QWidget *parent) :
+TaskDescription::TaskDescription(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::task)
+    ui(new Ui::TaskDescription)
 {
     ui->setupUi(this);
-}
 
-task::~task()
+}
+TaskDescription::~TaskDescription()
 {
     delete ui;
+
 }
-```
-- ### Now the implementation for the Two slots already declared in [task.h](#taskh)  
-```c++
-void task::on_OK_clicked()
+void TaskDescription::on_buttonBox_accepted()
 {
+
     logic=true;
     close();
 }
-void task::on_Cancel_clicked()
-{
-    logic=false;
-    close();
-}
 ```
+- ### Moving to ToDoApp and starting with `taskmanager.h`
 
-- ### Moving to taskmanager and starting with `taskmanager.h`
+## ToDoApp.h
 
-## Taskmanager.h
-
-- ###  first our class taskmanager will inherit from QMainWindow
+- ###  first our class ToDoApp will inherit from QMainWindow
 
 ```c++
-#ifndef TASKMANAGER_H
-#define TASKMANAGER_H
+#ifndef TODOAPP_H
+#define TODOAPP_H
 #include <QMainWindow>
-#include<QStringListModel>
-#include <QFileDialog>
+#include <QHBoxLayout>
+#include "taskdescription.h"
 #include <QFile>
-#include <QTextStream>
-#include <QCloseEvent>
-#include <QMessageBox>
-#include <QStandardItemModel>
-#include <QMouseEvent>
-#include "task.h"
-#include <QCloseEvent>
+#include <QLayout>
 QT_BEGIN_NAMESPACE
-namespace Ui { class taskmanager; }
+namespace Ui { class ToDoApp; }
 QT_END_NAMESPACE
 
-class taskmanager : public QMainWindow
+class ToDoApp : public QMainWindow
 {
     Q_OBJECT
 
-```
-
-- ### we will need a model ( our model is of type QStandardItemModel )
-- ### we will need three string where we will store the three tasks
-- ### we will need a file for each one ,in this files we can find our saves
-```c++
 public:
-    taskmanager(QWidget *parent = nullptr);
-    ~taskmanager();
-    QStandardItemModel *model=nullptr;
-    QStandardItemModel *model1=nullptr;
-    QStandardItemModel *model2=nullptr;
-    QStandardItemModel *model3=nullptr;
-      
-      QStringList Todaytasks;
-      QStringList Finishedtasks;
-      QStringList Pendingtasks;
-      
-      QFile  lyouma{"Today tasks.txt"};
-      QFile salaw{"Finished tasks.txt"};
-      QFile apres{"Pending tasks.txt"};
+    ToDoApp(QWidget *parent = nullptr);
+    ~ToDoApp();
+    QFile  lyouma{"item_based Today tasks.txt"};
+    QFile salaw{"item_based Finished tasks.txt"};
+    QFile apres{"item_based Pending tasks.txt"};
+
+    QStringList TT_list ;
+    QStringList PT_list ;
+    QStringList FT_list ;
+
 ```
-- ### A void function for load content
+- ### Two void functions saveContent and loadContent 
 
 ```c++
-void loadContent(QFile *filename=nullptr);
+void saveContent(QFile *filename) const;
+void loadContent(QFile *filename);
 ```
-- ### three void function for saving
-```c++
-void saveFinishedContent(QFile *filename=nullptr) const;
-void saveTodayContent(QFile *filename=nullptr) const;
-void savePendingContent(QFile *filename=nullptr) const;
-```
-- ### A public slot to create new task
- ```c++
- public slots:
-    void on_actionNew_triggered();
- ```
+
  - ### Here we have all the private slots for our actions
  ```c++
- private slots:
- void closeEvent (QCloseEvent *event);
- void on_actionExit_triggered();
- void on_actionShow_Pending_triggered();
- void on_actionShow_Finished_triggered();
- void on_actionShow_Today_tasks_triggered();
- void on_actionDelete_triggered();
- void on_actionShow_All_triggered(); 
- //to move a task from a listView to another
- void on_listView1_doubleClicked(const QModelIndex &index);
- void on_listView2_doubleClicked(const QModelIndex &index);
- void on_listView3_doubleClicked(const QModelIndex &index);
+private slots:
+    void on_action_New_triggered();
+    void on_action_Task_Pending_triggered();
+    void on_action_Task_finished_triggered();
+    void on_actionToday_s_Tasks_triggered();
+    void on_actionAll_Tasks_triggered();
+    void closeEvent (QCloseEvent *event);
+    void on_action_Quit_triggered();
+
+private:
+    Ui::ToDoApp *ui;
+};
+#endif // TODOAPP_H
  ```   
     
  - ### Now we will see the implementation of eache slot and function   
     
- ## Taskmanager.cpp
+ ## ToDoApp.cpp
  - ### _includes_
  ```c++
- #include "taskmanager.h"
-#include "ui_taskmanager.h"
-#include "task.h"
-#include "ui_task.h"
-#include <stdlib.h>
-#include <QDrag>
-#include <QMimeData>
-#include <QDropEvent>
+#include "todoapp.h"
+#include "ui_todoapp.h"
+#include "ui_taskdescription.h"
+#include "taskdescription.h"
+#include <QLayout>
+#include <QFileSystemModel>
+#include <QPixmap>
+#include <QTextStream>
+#include <QMessageBox>
+#include <QCloseEvent>
+#include <QStandardItem>
  ```
  
  - ### Starting with the constructor and Destructor
  ```c++
- taskmanager::taskmanager(QWidget *parent)
+ToDoApp::ToDoApp(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::taskmanager)
+    , ui(new Ui::ToDoApp)
 {
     ui->setupUi(this);
-
-    QStandardItem *model = new QStandardItem;
-
-   model1 = new QStandardItemModel();
-   model2 = new QStandardItemModel();
-   model3 = new QStandardItemModel();
-
-   QFile  lyouma{"Today tasks.txt"};
-   QFile salaw{"Finished tasks.txt"};
-   QFile apres{"Pending tasks.txt"};
-
-   model->setText("");
-   model1->appendRow(model);
-   ui->listView1->setModel(model1);
-   model2->appendRow(model);
-   ui->listView2->setModel(model2);
-   model3->appendRow(model);
-   ui->listView3->setModel(model3);
-
-   model1->removeRow(0);
-   model2->removeRow(0);
-   model3->removeRow(0);
-
-   loadContent(&lyouma);
-   loadContent(&salaw);
-   loadContent(&apres);
-
-   setAcceptDrops(false);
-      //ui->listView1->setAcceptDrops(true);
-   ui->listView1->setAcceptDrops(true);
-   ui->listView2->setAcceptDrops(true);
-   ui->listView3->setAcceptDrops(true);
+    QFile  lyouma{"item_based Today tasks.txt"};
+    QFile salaw{"item_based Finished tasks.txt"};
+    QFile apres{"item_based Pending tasks.txt"};
+    loadContent(&salaw);
+    loadContent(&lyouma);
+    loadContent(&apres);
 }
-taskmanager::~taskmanager()
+ToDoApp::~ToDoApp()
 {
     delete ui;
 }
  ```
-- ### The implementation of the `on_actionNew_triggered()` slot
-here we will use the bool `logic` already declared in `task` if the **Ok** button in `task.ui` is clicked `logic=true` if **Cancel** is clicked `logic=false`
+- ### The implementation of the `on_action_New_triggered()` slot
+here we will use the bool `logic` already declared in `TaskDescription` if the **Ok** button in `TaskDescription.ui` is clicked `logic=true` if **Cancel** is clicked `logic=false`
 after checking the logic if is it true or not now we should check the type of the task (finished,today or pending) . We passed through this conditions to store each task in their appropriate listView  
 
 
 ```c++
-void taskmanager::on_actionNew_triggered()
+void ToDoApp::on_action_New_triggered()
 {
-task T;
-T.ui->date->setDate(QDate::currentDate());
-T.exec();
-  QStandardItem *it = new QStandardItem();
-  
-if(T.logic){
-    if(T.ui->fincheck->isChecked()){
-      Finishedtasks.append(T.ui->Description->text()+":"+ T.ui->date->date().toString("ddd MMMM d yyyy")+":"+ T.ui->tag->currentText());
-      it->setIcon(QPixmap(":/new/prefix1/prfix1/task-completed.png"));
-      it->setText(T.ui->Description->text()+" : "+ T.ui->date->date().toString("ddd MMMM d yyyy")+":"+ T.ui->tag->currentText());
-      model3->appendRow(it);
-      ui->listView3->setModel(model3);
-      ui->listView3->update();
+    TaskDescription T;
+    T.ui->date->setDate(QDate::currentDate());
+    T.exec();
+    if(T.logic){
+
+   if(T.ui->fincheck->isChecked()){
+
+
+       FT_list.append(T.ui->description->text()+":"+ T.ui->date->date().toString("ddd MMMM d yyyy")+":"+ T.ui->tag->currentText());
+       QString path{":/new/prefix1/icone2/finished"};
+       QPixmap icon(path);
+       ui->finished->addItem(new QListWidgetItem(icon,T.ui->description->text()+":"+ T.ui->date->date().toString("ddd MMMM d yyyy")+":"+ T.ui->tag->currentText()));
+           }
+   else if(T. ui->date->date().toString("ddd MMMM d yyyy")==QDate::currentDate().toString("ddd MMMM d yyyy")){
+
+       TT_list.append(T.ui->description->text()+":"+ T.ui->date->date().toString("ddd MMMM d yyyy")+":"+ T.ui->tag->currentText());
+       QString path{":/new/prefix1/icone2/today"};
+       QPixmap icon(path);
+       ui->todays_task->addItem(new QListWidgetItem(icon,T.ui->description->text()+":"+ T.ui->date->date().toString("ddd MMMM d yyyy")+":"+ T.ui->tag->currentText()));
+  }
+   else{
+      PT_list.append(T.ui->description->text()+":"+ T.ui->date->date().toString("ddd MMMM d yyyy")+":"+ T.ui->tag->currentText());
+
+      QString path{":/new/prefix1/icone2/pending"};
+      QPixmap icon(path);
+      ui->to_be_done->addItem(new QListWidgetItem(icon,T.ui->description->text()+":"+ T.ui->date->date().toString("ddd MMMM d yyyy")+":"+ T.ui->tag->currentText()));
     }
-     else if(T. ui->date->date().toString("ddd MMMM d yyyy")==QDate::currentDate().toString("ddd MMMM d yyyy")){
-     Todaytasks.append(T.ui->Description->text()+":"+ T.ui->date->date().toString("ddd MMMM d yyyy")+":"+ T.ui->tag->currentText());
-     it->setIcon(QPixmap(":/new/prefix1/task.png"));
-     it->setText(T.ui->Description->text()+":"+ T.ui->date->date().toString("ddd MMMM d yyyy")+":"+ T.ui->tag->currentText());
-     model1->appendRow(it);
-     ui->listView1->setModel(model1);
-     ui->listView1->update();
-   }
-       else{
-    Pendingtasks.append(T.ui->Description->text()+":"+ T.ui->date->date().toString("ddd MMMM d yyyy")+":"+ T.ui->tag->currentText());
-    it->setIcon(QPixmap(":/new/prefix1/data-pending.png"));
-    it->setText(T.ui->Description->text()+":"+ T.ui->date->date().toString("ddd MMMM d yyyy")+":"+ T.ui->tag->currentText());
-    model2->appendRow(it);
-    ui->listView2->setModel(model2);
-    ui->listView2->update();
-  }
 T.close();
-  }
+      }
 }
 ```
     
 - ### load content 
-this function load the content of each listview using `QStringList` (Todaytasks,Finishedtasks,Pendingtasks)
+this function load the content of each listview using `QStringList` (TT_list,PT_list,FT_list)
 
 ```c++
-void taskmanager::loadContent(QFile *filename){
-
+void ToDoApp::loadContent(QFile *filename){
     if (filename->open(QIODevice::ReadOnly)) {
-        QTextStream in(filename);
+
         if(filename->fileName()==salaw.fileName()){
+            QTextStream in(filename);
             while (!in.atEnd()) {
-                QStandardItem *it = new QStandardItem();
-
                 QString line = in.readLine();
-            Finishedtasks.append(line);
-            it->setIcon(QPixmap(":/new/prefix1/task-completed.png"));
-            it->setText(line);
-              model3->appendRow(it);
-              ui->listView3->setModel(model3);
-         }
-     }
-        else if(filename->fileName()==lyouma.fileName()){
+                FT_list.append(line);
+                 QString path{":/new/prefix1/icone2/finished"};
+                  QPixmap icon(path);
+                  ui->finished->addItem(new QListWidgetItem(icon,line));
+           }
+       }
+        if(filename->fileName()==lyouma.fileName()){
+            QTextStream in(filename);
             while (!in.atEnd()) {
-                QStandardItem *it = new QStandardItem();
-
                 QString line = in.readLine();
-             Todaytasks.append(line);
-             it->setIcon(QPixmap(":/new/prefix1/task.png"));
-             it->setText(line);
-             model1->appendRow(it);
-                 ui->listView1->setModel(model1);
-     }
-  }
-        else if(filename->fileName()==apres.fileName()){
+                TT_list.append(line);
+                 QString path{":/new/prefix1/icone2/today"};
+                  QPixmap icon(path);
+                  ui->todays_task->addItem(new QListWidgetItem(icon,line));
+            }
+        }
+        if(filename->fileName()==apres.fileName()){
+            QTextStream in(filename);
             while (!in.atEnd()) {
-                QStandardItem *it = new QStandardItem();
                 QString line = in.readLine();
-                Pendingtasks.append(line);
-                it->setIcon(QPixmap(":/new/prefix1/data-pending.png"));
-                 it->setText(line);
-                 model2->appendRow(it);
-
-                 ui->listView2->setModel(model2);
-             }
-         }
+                PT_list.append(line);
+                 QString path{":/new/prefix1/icone2/pending"};
+                  QPixmap icon(path);
+                  ui->to_be_done->addItem( new QListWidgetItem(icon,line));
+               }
+          }
     }
 }
-
 ```
 - ### Saves
-#### We will implement the three functions which saves the content of each listview
-- ### saveTodayContent
+#### We will implement saveContent which saves the content of each QListWidget
 ```c++
-void taskmanager::saveTodayContent(QFile *filename) const
+void ToDoApp::saveContent(QFile *filename) const
 {
     //Openign the file
     if(filename->open(QIODevice::WriteOnly))  //Opening the file in writing mode
     {
         //Initiating a stream using the file
         QTextStream out(filename);
-        for ( int i=0; i < Todaytasks.size(); ++i )
-                        out << Todaytasks.at(i) << "\n";
+        if(filename==&lyouma){
+
+        for ( int i=0; i < TT_list.size(); ++i )
+                        out << TT_list.at(i) << "\n";
+        }
+        else if(filename==&salaw){
+
+            for ( int i=0; i < FT_list.size(); ++i )
+                            out <<FT_list.at(i) << "\n";
+        }
+        else if(filename==&apres){
+            for ( int i=0; i <PT_list.size(); ++i )
+                            out << PT_list.at(i) << "\n";
+        }
     }
     filename->close();
-}
-```
-- ### savePendingContent
-```c++
-void taskmanager::savePendingContent(QFile *filename) const
-{
-    //Openign the file
-    if(filename->open(QIODevice::WriteOnly))  //Opening the file in writing mode
-    {
-        //Initiating a stream using the file
-        QTextStream out(filename);
-        for ( int i=0; i < Pendingtasks.size(); ++i )
-                        out << Pendingtasks.at(i) << "\n";
-    }
-    filename->close();
-}
-```
-- ### saveFinishedContent
-```c++
-void taskmanager::saveFinishedContent(QFile *filename) const
-{
-    //Openign the file
-    if(filename->open(QIODevice::WriteOnly))  //Opening the file in writing mode
-    {
-        //Initiating a stream using the file
-        QTextStream out(filename);
-
-        for ( int i=0; i < Finishedtasks.size(); ++i )
-                        out << Finishedtasks.at(i) << "\n";
-    }
-    filename->close();
-}
-```
-
-
-- ### exit is an action which **save** the contents befor leaving the application
-
-```c++
-   void taskmanager::on_actionExit_triggered()
-{
-        saveTodayContent(&lyouma);
-        saveFinishedContent(&salaw);
-        savePendingContent(&apres);
-         QMessageBox::information(this,"DONE","saveeeed & exited");
-         qApp->exit();
 }
 ```
 
 - ### Close event
 ```c++
-void taskmanager::closeEvent (QCloseEvent *event)
+void ToDoApp::closeEvent (QCloseEvent *event)
 {
     QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Task MAnager",
                                                                 tr("Are you sure?\n"),
@@ -462,239 +351,51 @@ void taskmanager::closeEvent (QCloseEvent *event)
     if (resBtn != QMessageBox::Yes) {
         event->ignore();
     } else {
-        on_actionExit_triggered();
+        on_action_Quit_triggered();
         event->accept();
     }
 }
 ```
-- ### we have three slots called `on_actionShow_Pending_triggered , on_actionShow_Finished_triggered , on_actionShow_Today_tasks_triggered , on_actionShow_All_triggered`
+- ### we have three slots called `on_action_Task_Pending_triggered , on_action_Task_finished_triggered , on_actionToday_s_Tasks_triggered , on_actionAll_Tasks_triggered`
 
 ```c++
-void taskmanager::on_actionShow_Pending_triggered()
+void ToDoApp::on_action_Task_Pending_triggered()
 {
-    ui->listView1->hide();
-    ui->listView3->hide();
-    ui->listView2->show();
+     ui->to_be_done->show();
+     ui->todays_task->hide();
+      ui->finished->hide();
 }
-void taskmanager::on_actionShow_Finished_triggered()
+void ToDoApp::on_action_Task_finished_triggered()
 {
-    ui->listView1->hide();
-    ui->listView2->hide();
-    ui->listView3->show();
+     ui->todays_task->hide();
+     ui->to_be_done->hide();
+     ui->finished->show();
 }
-void taskmanager::on_actionShow_Today_tasks_triggered()
+void ToDoApp::on_actionToday_s_Tasks_triggered()
 {
-    ui->listView2->hide();
-    ui->listView3->hide();
-    ui->listView1->show();
+     ui->finished->hide();
+     ui->to_be_done->hide();
+     ui->todays_task->show();
 }
-void taskmanager::on_actionShow_All_triggered()
+void ToDoApp::on_actionAll_Tasks_triggered()
 {
-    ui->listView1->show();
-    ui->listView2->show();
-    ui->listView3->show();
+     ui->finished->show();
+     ui->to_be_done->show();
+     ui->todays_task->show();
 }
 ```
-- ### Delete
-```c++
-void taskmanager::on_actionDelete_triggered()
-{
-if( ui->listView1->model()->rowCount()!=0){
-    QModelIndexList indexes1;
-    indexes1= ui->listView1->selectionModel()->selectedIndexes();
-
-    for(auto iter = indexes1.constBegin(); iter != indexes1.constEnd(); ++iter){
-Todaytasks.removeAt((*iter).row());
-       model1->removeRow((*iter).row());
-        }
-}
-
-if (ui->listView2->model()->rowCount()!=0){
-    QModelIndexList indexes2;
-    indexes2 = ui->listView2->selectionModel()->selectedIndexes();
-
-    for(auto iter = indexes2.constBegin(); iter != indexes2.constEnd(); ++iter){
-        Pendingtasks.removeAt((*iter).row());
-       model2->removeRow((*iter).row());
-    }
-}
-
-if(ui->listView3->model()->rowCount()!=0){
-    QModelIndexList indexes3;
-    indexes3 = ui->listView3->selectionModel()->selectedIndexes();
-
-    for(auto iter = indexes3.constBegin(); iter != indexes3.constEnd(); ++iter){
-        Finishedtasks.removeAt((*iter).row());
-
-       model3->removeRow((*iter).row());
-      }
-   }
-}
-
-```
-- ### In a Task manager application you might want to move a task from list of pending task to today task in our application this functionality is possible 
-- ### we have three list view so we will implement three slots (on_listView1_doubleClicked , on_listView2_doubleClicked , on_listView3_doubleClicked)
-- ### here is the implementation of each one of them
-
-- ## on_listView1_doubleClicked
+- ### Finally we have the `on_action_Quit_triggered()` slot :
 
 ```c++
-void taskmanager::on_listView1_doubleClicked(const QModelIndex &index)
+void ToDoApp::on_action_Quit_triggered()
 {
-
-    QRegExp rx("(\\:)");
-    QStringList query = Todaytasks.at(index.row()).split(rx);
-    task T;
-    T.ui->date->setDate(QDate::currentDate());
-    T.ui->Description->setText(query.at(0));
-    T.ui->tag->setCurrentIndex(T.ui->tag->findText(query.at(2)));
-    T.exec();
-      QStandardItem *it = new QStandardItem();
-    if(T.logic){
-        Todaytasks.removeAt(index.row());
-        model1->removeRow(index.row());
-         saveTodayContent(&lyouma);
-           if(T.ui->fincheck->isChecked()){
-
-              Finishedtasks.append(T.ui->Description->text()+":"+ T.ui->date->date().toString("ddd MMMM d yyyy")+":"+ T.ui->tag->currentText());
-              it->setIcon(QPixmap(":/new/prefix1/task-completed.png"));
-              it->setText(T.ui->Description->text()+":"+ T.ui->date->date().toString("ddd MMMM d yyyy")+":"+ T.ui->tag->currentText());
-
-              model3->appendRow(it);
-              ui->listView3->setModel(model3);
-
-           }else if(T. ui->date->date().toString("ddd MMMM d yyyy")==QDate::currentDate().toString("ddd MMMM d yyyy")){
-               Todaytasks.append(T.ui->Description->text()+":"+ T.ui->date->date().toString("ddd MMMM d yyyy")+":"+ T.ui->tag->currentText());
-               it->setIcon(QPixmap(":/new/prefix1/task.png"));
-               it->setText(T.ui->Description->text()+":"+ T.ui->date->date().toString("ddd MMMM d yyyy")+":"+ T.ui->tag->currentText());
-               model1->appendRow(it);
-               ui->listView1->setModel(model1);
-
-           }
-           else{
-               Pendingtasks.append(T.ui->Description->text()+":"+ T.ui->date->date().toString("ddd MMMM d yyyy")+":"+ T.ui->tag->currentText());
-               it->setIcon(QPixmap(":/new/prefix1/data-pending.png"));
-               it->setText(T.ui->Description->text()+":"+ T.ui->date->date().toString("ddd MMMM d yyyy")+":"+ T.ui->tag->currentText());
-
-               model2->appendRow(it);
-               ui->listView2->setModel(model2);
-           }
-    T.close();
-
-      }
-    else
-        QMessageBox::critical(this,"faaaaalse","Canceled");
+        saveContent(&lyouma);
+        saveContent(&salaw);
+        saveContent(&apres);
+        QMessageBox::information(this,"DONE","saveeeed & exited");
+         qApp->exit();
 }
 ```
-- ## on_listView2_doubleClicked
-```c++
-void taskmanager::on_listView2_doubleClicked(const QModelIndex &index)
-{
-    QRegExp rx("(\\:)");
-    QStringList query = Pendingtasks.at(index.row()).split(rx);
-    task T;
-    QDate date;
-    T.ui->date->setDate(date.fromString(query.at(1),"ddd MMMM d yyyy"));
-    T.ui->Description->setText(query.at(0));
-    T.ui->tag->setCurrentIndex(T.ui->tag->findText(query.at(2)));
-    T.exec();
-      QStandardItem *it = new QStandardItem();
-    if(T.logic){
-        Pendingtasks.removeAt(index.row());
-
-        model2->removeRow(index.row());
-         savePendingContent(&apres);
-
-           if(T.ui->fincheck->isChecked()){
-
-              Finishedtasks.append(T.ui->Description->text()+" : "+ T.ui->date->date().toString("ddd MMMM d yyyy")+" :"+ T.ui->tag->currentText());
-              it->setIcon(QPixmap(":/new/prefix1/task-completed.png"));
-              it->setText(T.ui->Description->text()+" : "+ T.ui->date->date().toString("ddd MMMM d yyyy")+" :"+ T.ui->tag->currentText());
-
-              model3->appendRow(it);
-              ui->listView3->setModel(model3);
-
-
-           }else if(T. ui->date->date().toString("ddd MMMM d yyyy")==QDate::currentDate().toString("ddd MMMM d yyyy")){
-               Todaytasks.append(T.ui->Description->text()+" : "+ T.ui->date->date().toString("ddd MMMM d yyyy")+" :"+ T.ui->tag->currentText());
-               it->setIcon(QPixmap(":/new/prefix1/task.png"));
-               it->setText(T.ui->Description->text()+" : "+ T.ui->date->date().toString("ddd MMMM d yyyy")+" :"+ T.ui->tag->currentText());
-               model1->appendRow(it);
-               ui->listView1->setModel(model1);
-
-           }
-           else{
-               Pendingtasks.append(T.ui->Description->text()+" : "+ T.ui->date->date().toString("ddd MMMM d yyyy")+" :"+ T.ui->tag->currentText());
-               it->setIcon(QPixmap(":/new/prefix1/data-pending.png"));
-               it->setText(T.ui->Description->text()+" : "+ T.ui->date->date().toString("ddd MMMM d yyyy")+" :"+ T.ui->tag->currentText());
-
-               model2->appendRow(it);
-               ui->listView2->setModel(model2);
-           }
-    T.close();
-
-      }
-    else
-        QMessageBox::critical(this,"faaaaalse","Canceled");
-
-}
-```
-
-- ## on_listView3_doubleClicked
-```c++
-void taskmanager::on_listView3_doubleClicked(const QModelIndex &index)
-{
-    QRegExp rx("(\\:)");
-    QStringList query = Finishedtasks.at(index.row()).split(rx);
-    task T;
-    QDate date;
-    T.ui->date->setDate( date.fromString(query.at(1),"ddd MMMM d yyyy"));
-    T.ui->Description->setText(query.at(0));
-    T.ui->tag->setCurrentIndex(T.ui->tag->findText(query.at(2)));
-    T.ui->fincheck->setChecked(true);
-    T.exec();
-      QStandardItem *it = new QStandardItem();
-    if(T.logic){
-        Finishedtasks.removeAt(index.row());
-        model3->removeRow(index.row());
-         saveFinishedContent(&salaw);
-           if(T.ui->fincheck->isChecked()){
-
-              Finishedtasks.append(T.ui->Description->text()+" : "+ T.ui->date->date().toString("ddd MMMM d yyyy")+" :"+ T.ui->tag->currentText());
-              it->setIcon(QPixmap(":/new/prefix1/task-completed.png"));
-              it->setText(T.ui->Description->text()+" : "+ T.ui->date->date().toString("ddd MMMM d yyyy")+" :"+ T.ui->tag->currentText());
-              model3->appendRow(it);
-              ui->listView3->setModel(model3);
-           }else if(T. ui->date->date().toString("ddd MMMM d yyyy")==QDate::currentDate().toString("ddd MMMM d yyyy")){
-               Todaytasks.append(T.ui->Description->text()+" : "+ T.ui->date->date().toString("ddd MMMM d yyyy")+" :"+ T.ui->tag->currentText());
-               it->setIcon(QPixmap(":/new/prefix1/task.png"));
-               it->setText(T.ui->Description->text()+" : "+ T.ui->date->date().toString("ddd MMMM d yyyy")+" :"+ T.ui->tag->currentText());
-               model1->appendRow(it);
-               ui->listView1->setModel(model1);
-           }
-           else{
-               Pendingtasks.append(T.ui->Description->text()+" : "+ T.ui->date->date().toString("ddd MMMM d yyyy")+" :"+ T.ui->tag->currentText());
-               it->setIcon(QPixmap(":/new/prefix1/data-pending.png"));
-               it->setText(T.ui->Description->text()+" : "+ T.ui->date->date().toString("ddd MMMM d yyyy")+" :"+ T.ui->tag->currentText());
-
-               model2->appendRow(it);
-               ui->listView2->setModel(model2);
-           }
-    T.close();
-      }
-    else
-        QMessageBox::critical(this,"faaaaalse","Canceled");
-
-}
-
-```
-    
-    
-    
-    
-    
-    
-    
     
  [Top](#top) 
  
