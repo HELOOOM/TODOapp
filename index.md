@@ -1,6 +1,8 @@
 ###### Top
 [The End](#the-end)
 
+### PART 1
+
 # ToDo Application using containers
 
 ## **BY** : 
@@ -19,23 +21,19 @@
 3. Read tasks
 4. Delete tasks
 
-## TodoMVC is an immensely valuable attempt at a difficult problem - providing a structured way of comparing JS libraries and frameworks. TodoMVC is a lone data point in a sea of conjecture and opinion.
-
 ## First let's describe our application
-### In our Task Manager application we have:
+### In our TodoApp application we have:
 1. A menu bar containing : "File , Options , Help"
    - file menu containing : "New , Exit"
      - **_New_** is an action which can add a new task to our application
      - **_Exit_** is an action which **save** the contents befor leaving the application
-   - options menu containing : "Delete, show all, show pending task, show finished task, show today task"
-     - **_Delete task_** is an action which can delete a selected task
+   - options menu containing : "show all, show pending task, show finished task, show today task"
      - **_Show all_** is an action which show pending,today and finished task
      - **_Show pending_** is an action which show pending task
      - **_Show finished_** is an action which show finished task
      - **_Show today task_** is an action which show today task
    - Help menu containing : "About , About Qt"
-2. A Tool bar containing actions like : "new task, show finished, show pending, delete, exit"
-3. A List view; in our application we have tree each one display a specific type of tasks
+2. A Tool bar containing actions like : "new task, show finished, show pending, exit"
    
 # our application look like this:
 ![image](https://user-images.githubusercontent.com/53974876/150686344-145503b7-91e5-48f7-8154-ed50ce460d23.png)
